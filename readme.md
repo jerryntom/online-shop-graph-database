@@ -1,0 +1,1 @@
+Simplified graph database created to show example implementation for online shop
