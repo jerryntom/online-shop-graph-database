@@ -1,0 +1,5 @@
+Database export neo4j
+neo4j-admin database dump --to-path="C:\Users\jarek\Desktop\Projects\Graph databases - online shop\dumps" neo4j
+
+Import
+neo4j-admin database load --from-path="C:\Users\jarek\Desktop\Projects\Graph databases - online shop\dumps" neo4jcopy

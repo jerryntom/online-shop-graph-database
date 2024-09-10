@@ -1,0 +1,49 @@
+PRODUCT BELONGS_TO_CATEGORY
+
+MATCH (p:Product), (c:Category)
+WHERE 
+  (p.product_name = "Stół rozkładany do jadalni 160/200x90 cm biały + 6 krzeseł szary welur" AND c.category_name = "Dom i ogród") OR
+  (p.product_name = "Laptop Lenovo IdeaPad 3 15ITL6 15.6\" Intel Core i5-1135G7 8GB RAM 256GB SSD Win11" AND c.category_name = "Elektronika") OR
+  (p.product_name = "Opony zimowe Dębica Frigo HP2 205/55R16 91H" AND c.category_name = "Motoryzacja") OR
+  (p.product_name = "Sukienka letnia maxi z falbankami w kwiaty" AND c.category_name = "Moda") OR
+  (p.product_name = "Rower górski Kross Hexagon X7 2023 czarny matowy" AND c.category_name = "Sport i turystyka") OR
+  (p.product_name = "Sapiens. Skrócona historia ludzkości Yuval Noah Harari" AND c.category_name = "Kultura i rozrywka") OR
+  (p.product_name = "Wkrętarka udarowa Makita DTD171Z 18V Li-Ion bez akumulatorów" AND c.category_name = "Elektronika") OR
+  (p.product_name = "Smartfon Samsung Galaxy A53 5G 8GB/256GB czarny" AND c.category_name = "Telefony i akcesoria") OR
+  (p.product_name = "Klocki Lego City 60312 Posterunek Policji" AND c.category_name = "Dla dziecka") OR
+  (p.product_name = "Krem do twarzy z filtrem SPF 50+ La Roche-Posay Anthelios Ultra Light Fluid" AND c.category_name = "Uroda") OR
+  (p.product_name = "Obraz na płótnie abstrakcyjny 100x70 cm" AND c.category_name = "Kultura i rozrywka") OR
+  (p.product_name = "Buty do biegania damskie Nike Air Zoom Pegasus 39" AND c.category_name = "Sport i turystyka") OR
+  (p.product_name = "Płyta winylowa Pink Floyd - The Dark Side of the Moon" AND c.category_name = "Kultura i rozrywka") OR
+  (p.product_name = "Odkurzacz pionowy bezprzewodowy Xiaomi Mi Vacuum Cleaner G11" AND c.category_name = "Dom i ogród") OR
+  (p.product_name = "Etui do telefonu Samsung Galaxy S22 Ultra silikonowe czarne" AND c.category_name = "Telefony i akcesoria") OR
+  (p.product_name = "Kicia Kocia - zestaw 10 książek" AND c.category_name = "Dla dziecka") OR
+  (p.product_name = "Paletka cieni do powiek MAC Cosmetics Cosmetics Ultimate Face Palette" AND c.category_name = "Uroda") OR
+  (p.product_name = "Szafa ubraniowa przesuwna 200 cm dąb sonoma" AND c.category_name = "Dom i ogród") OR
+  (p.product_name = "Konsola PlayStation 5 Digital Edition" AND c.category_name = "Elektronika") OR
+  (p.product_name = "Zegarek męski Seiko Prospex Diver Automatic SRPD21K1" AND c.category_name = "Telefony i akcesoria")  
+CREATE (p)-[:BELONGS_TO_CATEGORY]->(c)
+
+ORDER ORDERED BY CLIENT
+
+MATCH (o:Order)
+WITH collect(o) AS orders
+MATCH (c:Client)
+WITH orders, collect(c) AS clients
+UNWIND orders AS order
+WITH clients, order, size(clients) AS num_clients
+WITH clients, order, CASE WHEN num_clients > 1 THEN clients[toInteger(rand() * num_clients)] END AS selected_client
+MERGE (order)-[:ORDERED_BY]->(selected_client)
+
+ORDER CONTAINS PRODUCT
+
+MATCH (o:Order)
+WITH collect(o) AS orders
+MATCH (p:Product)
+WITH orders, collect(p) AS products
+UNWIND orders AS order
+WITH order, products, size(products) AS numProducts
+WITH order, products, CASE WHEN numProducts > 2 THEN [products[toInteger(rand() * numProducts)], products[toInteger(rand() * numProducts)]] END AS selected_products
+UNWIND selected_products AS product
+MERGE (order)-[:CONTAINS]->(product)
+

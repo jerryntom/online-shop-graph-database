@@ -1,0 +1,28 @@
+Usunięcie węzła ze wszystkimi relacjami
+
+MATCH (c:Category {category_name: "Moda"})
+DETACH DELETE c
+
+Aktualizacja Polska -> Poland
+
+MATCH (c:Client {country: "Polska"})
+SET c.country = "Poland"
+RETURN c
+
+Usuwanie właściwości z węzła
+
+MATCH (p:Product {product_name: "Laptop Lenovo IdeaPad 3 15ITL6 15.6\" Intel Core i5-1135G7 8GB RAM 256GB SSD Win11"})
+REMOVE p.unit_price
+RETURN p
+
+Usunięcie zamówień z marca 2023 r. wraz z relacjami
+
+match (o:Order)
+where o.order_date starts with '2023-03'
+detach delete o
+
+Zmiany nazwy relacji CONTAINS na CONSISTS_OF
+
+match (o:Order)-[r:CONTAINS]->(p:Product)
+create (o)-[new_r:CONSISTS_OF]->(p)
+delete r

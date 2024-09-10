@@ -1,0 +1,35 @@
+Tworzenie uzytkownika:
+
+CREATE USER admin_shop SET PASSWORD 'password' CHANGE NOT REQUIRED;
+
+CREATE USER uzyt_odczyt SET PASSWORD 'password' CHANGE NOT REQUIRED;
+
+CREATE USER uzyt_odczyt_zapis SET PASSWORD 'password' CHANGE NOT REQUIRED;
+
+
+Nadawanie uprawnień:
+
+GRANT ROLE ADMIN TO admin_shop
+
+GRANT ROLE reader TO uzyt_odczyt
+
+GRANT ROLE editor TO uzyt_odczyt_zapis
+
+
+Testowanie użytkowników:
+
+admin_shop
+
+MATCH (n) RETURN n limit 10;
+CREATE (p21:Product {product_name: "Zegarek męski Benyar Exellence", unit_price: 1999})
+
+uzyt_odczyt
+
+MATCH (n) RETURN n limit 10;
+CREATE (cat10:Category {category_name: "Zdrowie"})
+
+uzyt_odczyt_zapis
+
+MATCH (n) RETURN n limit 10;
+CREATE (o36:Order {order_number: "6/20230610", order_date: '2023-06-09'})
+CREATE USER uzyt_1 SET PASSWORD 'password' CHANGE NOT REQUIRED;

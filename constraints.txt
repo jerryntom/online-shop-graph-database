@@ -1,0 +1,15 @@
+Category
+
+create constraint for (c:category) require c.category_name is unique
+
+Client
+
+create constraint for (c:client) require c.country is unique
+
+Order
+
+create constraint for (o:order) require o.order_number is unique
+
+Product
+
+create constraint for (p:product) require p.product_name is unique

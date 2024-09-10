@@ -1,0 +1,77 @@
+1.Znajdź wszystkie  produkty należące do danych kategorii.
+match (p:Product)-[:BELONGS_TO_CATEGORY]->(c:Category) return c,p
+
+2.Znajdź wszystkie produkty kupione przez konkretnego klienta.
+MATCH (c:Client)<-[:ORDERED_BY]-(o:Order)-[:CONTAINS]->(p:Product)
+where id(c)=79
+RETURN 
+p.product_name AS nazwa_produktu, 
+p.unit_price AS cena 
+order by cena desc
+
+3.Znajdź wszystkich klientów, którzy dokonali min 2 zakupów.
+MATCH (c:Client)<-[:ORDERED_BY]-(o:Order)
+with c, count(o) as liczba_zamowien
+where liczba_zamowien >= 2
+return id(c),
+liczba_zamowien
+order by liczba_zamowien desc
+
+4.Znajdź najpopularniejszą kategorię produktów na podstawie ilości zakupów.
+MATCH (o:Order)-[:CONTAINS]->(p:Product)-[:BELONGS_TO_CATEGORY]->(c:Category)
+WITH c.category_name as kategoria, count(c) AS liczba_wystapien
+ORDER BY liczba_wystapien desc
+limit 1
+WITH liczba_wystapien AS max_liczba_wystapien
+MATCH (o:Order)-[:CONTAINS]->(p:Product)-[:BELONGS_TO_CATEGORY]->(c:Category)
+WITH c.category_name as kategoria, count(c) AS liczba_wystapien, max_liczba_wystapien
+WHERE liczba_wystapien = max_liczba_wystapien
+RETURN kategoria, liczba_wystapien
+
+5.Znajdź wszystkie produkty, które były kupione z danej lokalizacji.
+MATCH (c:Client)<-[:ORDERED_BY]-(o:Order)-[:CONTAINS]->(p:Product)
+where c.country="Polska"
+return p.product_name
+
+6.Znajdź klientów, którzy zrealizowali najwięcej zamówień.
+MATCH (c:Client)<-[:ORDERED_BY]-(o:Order)
+WITH id(c) as id_klienta, count(c) AS liczba_zamowien
+ORDER BY liczba_zamowien desc
+limit 1
+WITH liczba_zamowien AS max_liczba_zamowien
+MATCH (c:Client)<-[:ORDERED_BY]-(o:Order)
+WITH id(c) as id_klienta, count(c) AS liczba_zamowien, max_liczba_zamowien
+WHERE liczba_zamowien = max_liczba_zamowien
+RETURN id_klienta, liczba_zamowien
+
+7.Rozkład procentowy klientów według krajów zamieszkania
+match (c:Client)
+with c.country as kraj, count(*) as ilosc_klientow_kraj
+match (c:Client)
+with kraj, ilosc_klientow_kraj, count(*) as suma_ilosc_klientow
+return kraj, (toFloat(ilosc_klientow_kraj)/suma_ilosc_klientow*100) as udzial_procentowy
+
+8. Analiza ilości zamówień w czasie
+match (o:Order)
+with date(o.order_date) as data
+return data.year as rok, data.month as miesiac, count(*) as ilosc_zamowien
+
+9. Zidentyfikuj klientów, którzy zamawiali produkty z różnych kategorii.
+MATCH (c:Client)<-[:ORDERED_BY]-(o:Order)-[:CONTAINS]->(p:Product)-[:BELONGS_TO_CATEGORY]->(cat:Category)
+with id(c) as id_klienta, count(distinct cat) as ilosc_kategorii
+where ilosc_kategorii >= 3
+return id_klienta, ilosc_kategorii
+order by ilosc_kategorii desc
+
+10.Rekomendacja produktów na bazie poprzednich zamówień. 
+match (c:Client)<-[:ORDERED_BY]-(o:Order)-[:CONTAINS]->(p:Product)-[:BELONGS_TO_CATEGORY]->(cat:Category)
+where id(c)=83
+with distinct cat as category
+match (p:Product)-[:BELONGS_TO_CATEGORY]->(category)
+WHERE NOT EXISTS {
+  MATCH (c)<-[:ORDERED_BY]-(:Order)-[:CONTAINS]->(p)
+  where id(c)=83
+}
+return distinct p.product_name as nazwa_produktu, category.category_name as kategoria
+
+

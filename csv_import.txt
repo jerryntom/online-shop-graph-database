@@ -1,0 +1,5 @@
+LOAD CSV WITH HEADERS FROM "file:///C:\Users\jarek\Desktop\data.csv" AS row
+WITH row WHERE row.category_name IS NOT NULL
+MERGE (c:Category {category_name: row.category_name})
+MERGE (p:Product {product_name: row.product_name, unit_price: toFloat(row.unit_price)})
+MERGE (p)-[:BELONGS_TO_CATEGORY]->(c)
